@@ -7,6 +7,7 @@ from pathlib import Path
 
 from browser import agent_browser
 from output import redact, tagged
+from utils import remove_preview
 
 ALLOWED = {"snapshot", "read", "click", "fill"}
 ALLOWED_SITE = "https://www.ikea.com/ca/"
@@ -75,6 +76,7 @@ def mark(reply, text):
 # 6. run_tool: check permission, run the command, and return marked page content or the checked result
 def run_tool(name, tool_input):
     args = tool_input.get("args", [])
+    remove_preview()  # take down the --step preview from utils.py, if there is one
     refusal = permission(args)
     if refusal:
         print(tagged("blocked", refusal))

@@ -57,7 +57,7 @@ uv run python tests/run_demo_1.py
 uv run python tests/run_demo_2.py
 ```
 
-Each script runs its demo in manual mode on IKEA Canada, types the tool calls a model would make,
-and checks the output. They open a browser window for up to a minute and call no model. Demo 1's
+Each script calls its demo's tools directly, the way a model would, on IKEA Canada, and checks the
+output. They open a browser window for up to a minute and call no model. Demo 1's
 check only reads. Demo 2's check runs as a guest and puts one desk in the guest cart of a
 throwaway session. It needs `npm install` in its demo directory first.

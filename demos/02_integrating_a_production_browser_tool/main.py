@@ -3,7 +3,6 @@
 uv run main.py            Claude does the task, signed in with ikea_sign_in.json
 uv run main.py --guest    the same, as a guest, without the saved sign-in
 uv run main.py --step     Claude does the task, and you press Enter at each hand-off
-uv run main.py --manual   you play the model and type agent-browser commands yourself
 """
 
 import os
@@ -16,7 +15,7 @@ from dotenv import load_dotenv
 import agent
 import browser
 from output import tagged
-from tools import run_tool, who_is_signed_in
+from tools import who_is_signed_in
 
 load_dotenv()  # reads ANTHROPIC_API_KEY, and CHROME_PATH if set, from the .env file at the top of the repository
 DEMO_DIR = Path(__file__).parent
@@ -41,7 +40,7 @@ SYSTEM = f"{SKILL}\n# Rules from the harness\n\n{RULES}"
 # 2. Stop early if the sign-in or the API key is missing, and stop cleanly on Ctrl-C (the session still closes)
 if not GUEST and not SIGN_IN.exists():
     sys.exit("[error] No saved sign-in. Run save_sign_in.py first, or add --guest.")
-if "--manual" not in sys.argv and not os.environ.get("ANTHROPIC_API_KEY"):
+if not os.environ.get("ANTHROPIC_API_KEY"):
     sys.exit("[error] ANTHROPIC_API_KEY is not set. Copy .env.example to .env at the top of the repository.")
 signal.signal(signal.SIGINT, lambda *args: sys.exit("\n[stopped] Ctrl-C"))
 
@@ -54,16 +53,9 @@ print(tagged("identity", f"IKEA says: {account}"))
 if not GUEST and ("Log in" in account or account == "unknown"):
     sys.exit("[identity] No signed-in account, so the agent does not start. Run save_sign_in.py again.")
 
-# 5. Manual mode: you play the model and type the agent-browser commands yourself
-if "--manual" in sys.argv:
-    print(tagged("step", "You are the model. Type snapshot, read, click @e3, or fill @e1 some text. An empty line stops."))
-    while line := input("browser> ").strip():
-        print(tagged("result", run_tool("browser", {"args": line.split(maxsplit=2)})))
-    sys.exit()
-
-# 6. Claude does the task with the one browser tool
+# 5. Claude does the task with the one browser tool
 agent.run(TASK, SYSTEM, step="--step" in sys.argv)
 
-# 7. A second session starts with its own new profile and no saved sign-in, so IKEA sees a guest there
+# 6. A second session starts with its own new profile and no saved sign-in, so IKEA sees a guest there
 browser.open_session(START_URL, session="demo2-second")
 print(tagged("session", f"a second session: IKEA says {who_is_signed_in('demo2-second')}"))
