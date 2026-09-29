@@ -39,7 +39,8 @@ MARKER = """(([r, label]) => {
 
 def preview(name, tool_input, refs):
     args = tool_input.get("args", [])
-    labels = {"snapshot": "Claude wants to take a snapshot", "read": "Claude wants to read the page text",
+    labels = {"open": f"Claude wants to open {args[1] if len(args) > 1 else 'a page'}",
+              "snapshot": "Claude wants to take a snapshot", "read": "Claude wants to read the page text",
               "click": "Claude wants to click", "fill": f'Claude wants to type "{" ".join(args[2:])}"'}
     label = labels.get(args[0], f'Claude wants to run "{" ".join(args)}"') if args else "Claude sent no command"
     box = None

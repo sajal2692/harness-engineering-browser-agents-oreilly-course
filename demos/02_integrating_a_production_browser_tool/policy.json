@@ -1,0 +1,5 @@
+{
+  "default": "deny",
+  "allow": ["launch", "navigate", "snapshot", "read", "click", "fill", "diff_snapshot", "screenshot",
+            "scrollintoview", "boundingbox", "url", "evaluate", "close"]
+}
