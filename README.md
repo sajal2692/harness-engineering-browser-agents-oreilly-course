@@ -25,7 +25,7 @@ troubleshooting.
 | | Demo 1: Building Browser Tools | Demo 2: Integrating a Production Browser Tool |
 |---|---|---|
 | Question | What does it take to let a model read a web page and act on it? | What does a production browser tool add, and what stays with the harness? |
-| Shows | Chrome's accessibility tree turned into a short snapshot with element refs, clicks and typing sent as Chrome DevTools Protocol commands, a ref that goes stale, and Claude comparing IKEA desks with the three tools | agent-browser mounted through a skill, a saved sign-in loaded into a session the harness owns, an identity check, an approval before the cart, a check that the cart changed, and annotated screenshots of what Claude can click |
+| Shows | Chrome's accessibility tree turned into a short snapshot with element refs, clicks and typing sent as Chrome DevTools Protocol commands, a ref that goes stale, and Claude comparing IKEA desks with the three tools | agent-browser mounted through a skill, a saved sign-in loaded into a session the harness owns, an identity check, page content marked for the model, permission checks that allow, ask before the cart, or refuse, a check that the cart changed, a run record, and annotated screenshots of what Claude can click |
 | Start here | [demos/01_building_browser_tools](demos/01_building_browser_tools/README.md) | [demos/02_integrating_a_production_browser_tool](demos/02_integrating_a_production_browser_tool/README.md) |
 
 ## Requirements
