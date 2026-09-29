@@ -51,8 +51,7 @@ def launch(url):
     ws = connect(tab["webSocketDebuggerUrl"], max_size=None, legacy=True)
     print(tagged("browser", f"Chrome for Testing with a new profile in {profile}, deleted on exit"))
     print(tagged("browser", f"connected to {tab['webSocketDebuggerUrl']}"))
-    cdp("DOM.enable")  # the Overlay domain, which draws highlights, needs the DOM domain
-    cdp("Overlay.enable")
+    cdp("DOM.enable")
 
 
 def close(chrome, profile):

@@ -6,7 +6,8 @@ import sys
 import anthropic
 
 from output import tagged
-from tools import TOOLS, run_tool
+from tools import TOOLS, refs, run_tool
+from utils import preview
 
 MODEL = "claude-sonnet-5-5"
 
@@ -55,6 +56,8 @@ def run(task, system, step=False):
         # 4. Run the one tool Claude asked for, and send back the result
         call = next(block for block in response.content if block.type == "tool_use")
         print(tagged("claude", f"calls {call.name} {json.dumps(call.input)}"))
+        if step:
+            preview(call.name, call.input, refs)  # show the call in the browser while you explain it
         pause("Press Enter to run it in the browser.")
         result = run_tool(call.name, call.input)
         lines = result.splitlines()

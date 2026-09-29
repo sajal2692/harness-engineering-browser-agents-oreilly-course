@@ -6,6 +6,7 @@ import time
 
 from browser import cdp
 from output import tagged
+from utils import highlight, remove_highlight
 
 ACTIONABLE = {"link", "button", "textbox", "searchbox", "combobox"}
 refs = {}  # ref -> backendDOMNodeId, for the latest snapshot only
@@ -41,18 +42,13 @@ def snapshot():
     return text
 
 
-# 2. highlight: outline the element in the browser window for a second, so everyone can see the target
-def highlight(node_id):
-    cdp("Overlay.highlightNode", backendNodeId=node_id, highlightConfig={"contentColor": {"r": 255, "g": 0, "b": 0, "a": 0.35}})
-    time.sleep(1)
-    cdp("Overlay.hideHighlight")
-
-
-# 3. click: scroll the element into view, find its centre on screen, then move, press, and release the mouse
+# 2. click: scroll the element into view, find its centre on screen, then move, press, and release the mouse
 def click(ref):
     node_id = refs[ref]
     cdp("DOM.scrollIntoViewIfNeeded", backendNodeId=node_id)
-    highlight(node_id)
+    highlight(node_id, "Claude: click")
+    time.sleep(1)
+    remove_highlight()
     quads = cdp("DOM.getContentQuads", backendNodeId=node_id)["quads"]  # the element's corners on screen
     if not quads:
         return f"error: {ref} has no area on screen, so it cannot be clicked. Take a new snapshot."
@@ -63,21 +59,24 @@ def click(ref):
     return f"clicked {ref} at ({x:.0f}, {y:.0f})"
 
 
-# 4. type: focus the field, select any old text, and insert the new text in its place
+# 3. type: focus the field, select any old text, and insert the new text in its place
 def type_text(ref, text):
     cdp("DOM.focus", backendNodeId=refs[ref])
-    highlight(refs[ref])
+    highlight(refs[ref], f'Claude: type "{text}"')
+    time.sleep(1)
+    remove_highlight()
     cdp("Runtime.evaluate", expression="document.activeElement.select()")
     cdp("Input.insertText", text=text)
     return f'typed "{text}" into {ref}'
 
 
-# 5. run_tool: check the ref, run the tool, and turn Chrome's errors into text the model can read
+# 4. run_tool: check the ref, run the tool, and turn Chrome's errors into text the model can read
 def run_tool(name, args):
     ref = args.get("ref")
     if name in ("click", "type") and ref not in refs:
         return f"error: {ref} is not in the latest snapshot. Take a new snapshot."
     try:
+        remove_highlight()  # take down the --step preview from utils.py, if there is one
         if name == "snapshot":
             return snapshot()
         if name == "click":
@@ -91,7 +90,7 @@ def run_tool(name, args):
         return "timeout: Chrome did not answer within 30 seconds. The action may have happened. Take a new snapshot."
 
 
-# 6. The tool definitions Claude sees
+# 5. The tool definitions Claude sees
 TOOLS = [
     {"name": "snapshot", "description": "Read the current page as text. Elements you can act on have a ref like @e3.",
      "input_schema": {"type": "object", "properties": {}}},
