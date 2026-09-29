@@ -1,0 +1,14 @@
+[project]
+name = "harness-engineering-browser-agents-course"
+version = "0.1.0"
+description = "Demos for the Harness Engineering for Browser Agents live course on O'Reilly"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic==1.9.0",
+    "python-dotenv==1.2.3",
+    "websockets==17.1",
+]
+
+[tool.uv]
+package = false
