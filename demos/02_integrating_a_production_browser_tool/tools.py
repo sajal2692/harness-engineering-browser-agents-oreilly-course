@@ -42,6 +42,12 @@ def what_changed(url_before):
     moved = f"the address changed to {url_after}" if url_after != url_before else f"the address stayed {url_before}"
     summary = f"The harness compared the page before and after: {added} lines added, {removed} removed, and {moved}."
     print(tagged("verify", summary))
+    changes = [line for line in data.get("diff", "").splitlines() if line[:1] in "+-" and line[:3] not in ("+++", "---")]
+    named = [f"{line[0]} {line[1:].strip()}" for line in changes if '"' in line and "StaticText" not in line]
+    named.sort(key=lambda line: "heading" not in line)  # headings first: they say best what the page became
+    if named:  # show the room what appeared (+) and disappeared (-), leaving out the page's structure
+        more = f"\n... and {len(named) - 8} more named elements" if len(named) > 8 else ""
+        print(tagged("diff", "\n".join(line[:100] for line in named[:8]) + more))
     if 0 < added + removed <= 40:  # a small change is worth showing in full
         summary += "\n" + mark(diff, data.get("diff", ""))
     return summary
@@ -62,11 +68,14 @@ def run_tool(name, tool_input):
     reply = agent_browser(*(["snapshot", "-i"] if args[0] == "snapshot" else args))
     if not reply.get("success"):
         error = reply.get("error", "")
-        if "denied by policy" in error or "allowed domains" in error:  # agent-browser's own controls said no
+        if any(reason in error for reason in ("denied by policy", "allowed domains", "covered by")):  # the tool said no
             print(tagged("refused", f"agent-browser refused it: {error}"))
         return f"error: {error}"
     data = reply["data"]
     if args[0] == "snapshot":
+        kept = refs.keys() & data.get("refs", {}).keys()  # agent-browser keeps a ref while its element is on the page
+        print(tagged("refs", f"{len(kept)} kept from the last snapshot, {len(data.get('refs', {})) - len(kept)} new, "
+                             f"{len(refs) - len(kept)} gone"))
         refs.clear()
         refs.update(data.get("refs", {}))
         SCREENSHOTS.mkdir(exist_ok=True)  # every snapshot also saves a picture with numbered boxes on the refs

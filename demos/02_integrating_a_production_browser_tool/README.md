@@ -53,7 +53,9 @@ uv run main.py
 ```
 
 `--step` pauses at each hand-off in the loop, as in Demo 1. When agent-browser's domain limit or
-action policy refuses something, a `[refused]` line prints in the terminal. Screenshots in `screenshots/` and run
+action policy refuses something, a `[refused]` line prints in the terminal. After each click or fill,
+`[verify]` and `[diff]` show what changed on the page, and after each snapshot `[refs]` shows how many
+refs carried over from the last one. Screenshots in `screenshots/` and run
 records in `runs/` stay on your machine.
 
 ## Troubleshooting

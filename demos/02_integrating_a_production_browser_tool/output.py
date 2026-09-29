@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 COLORS = {"browser": "90", "session": "35", "thinking": "36", "claude": "1;36", "result": "37", "blocked": "1;31", "refused": "1;31",
-          "verify": "32", "step": "1;35", "stopped": "33"}
+          "verify": "32", "diff": "33", "refs": "36", "step": "1;35", "stopped": "33"}
 RUN_RECORD = Path(__file__).parent / "runs" / f"{time.strftime('%Y-%m-%d_%H%M%S')}.log"
 
 
